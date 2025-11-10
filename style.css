@@ -1,0 +1,171 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  color: rgb(255, 167, 0);
+  background-color: #004646;
+  min-height: 100vh;
+}
+
+.maindiv {
+  width: 100vw;
+  height: 100vh;
+  flex-direction: row;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.thanks>span {
+  text-transform: capitalize;
+  font-family: "Parisienne", cursive;
+  text-align: center;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 80px;
+}
+
+.thanks, .share {
+  width: 50vw;
+  height: 50vh;
+  border-top: 4px dashed;
+  border-left: 4px dashed;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 40px;
+  flex-direction: column;
+  gap: 40px;
+  padding: 5%;
+}
+
+.share {
+  font-size: 30px;
+  gap: 30px;
+}
+
+.small {
+  font-size: 25px;
+}
+
+.inputgroup {
+  width: 80%;
+}
+
+.inputbox {
+  background: none;
+  border: 2px dashed;
+  padding: 10px;
+  color: rgb(255, 167, 0);
+  font-size: 25px;
+  width: 80%;
+  border-radius: 20px;
+}
+button.inputbox {
+  width: auto;
+  background-color: rgba(255, 167, 0, 75%);
+  color: #004646;
+  cursor: pointer;
+}
+button.inputbox:hover {
+  background-color: rgb(255, 167, 0);
+}
+.inputgroup>:first-child {
+  border-radius: 20px 0 0 20px;
+}
+
+.inputgroup>:last-child {
+  border-radius: 0 20px 20px 0;
+  border-right: 2px dashed;
+}
+
+.inputgroup {
+  display: flex;
+  flex-direction: row;
+}
+
+.highlight {
+  border: 2px dashed;
+  border-radius: 20px;
+  padding: 10px;
+}
+
+.modalback {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #0008;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.modal {
+  padding: 30px;
+  background: #004646;
+  border-radius: 20px;
+  border: 2px dashed;
+  font-size: 20px;
+  text-align: center;
+}
+
+.modal>.inputbox {
+  font-size: 14px;
+  padding: 8px;
+  margin-top: 10px;
+  border-radius: 15px;
+}
+
+@media (max-width:1200px)  {
+  .thanks>span {
+    font-size: 65px;
+  }
+}
+
+@media (max-width:900px)  {
+  .thanks, .share {
+    font-size: 20px;
+  }
+
+  .small {
+    font-size: 20px;
+  }
+
+  .inputbox {
+    font-size: 20px;
+  }
+  .thanks>span {
+    font-size: 55px;
+  }
+}
+
+
+@media (max-width:600px)  {
+  .thanks, .share {
+    width: 100vw;
+    height: 25vh;
+    border-top: 4px dashed;
+    border-left: none;
+    font-size: 20px;
+    gap: 10px;
+  }
+
+  .small {
+    font-size: 15px;
+  }
+
+  .inputbox {
+    font-size: 12px;
+    padding: 8px;
+  }
+
+  .thanks>span {
+    font-size: 45px;
+  }
+}

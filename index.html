@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wedding Photos</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Parisienne&display=swap" rel="stylesheet">
+</head>
+
+<body>
+  <div class="maindiv">
+    <div class="thanks">
+      <span>Thanks for attending our wedding.</span>
+    </div>
+    <div class="share">
+      <span>Add us to your Google/Apple photos album</span>
+      <span class="highlight">subhashsridharan@gmail.com</span>
+    </div>
+    <div class="share">
+      <span>Share your album link</span>
+      <div class="inputgroup">
+        <input class="inputbox" id="linkInput" type="text" placeholder="Your Album link">
+        <button class="inputbox" id="linkSubmit">Submit</button>
+      </div>
+    </div>
+    <div class="share">
+      <span>Upload photos from this device</span>
+      <input class="inputbox" id="nameInput" type="text" placeholder="Your Name">
+      <input class="inputbox" id="fileInput" type="file" multiple>
+      <button class="inputbox" id="uploadbutton">Upload</button>
+    </div>
+  </div>
+  <div class="modalback" style="display: none;" id="modalBack">
+    <div class="modal" id="thanks" style="display: none;">Thanks for sharing your Pictures!!!</div>
+    <div class="modal" id="progress" style="display: none;"></div>
+    <div class="modal" id="message" style="display: none;">
+      <span id="errorMessage"></span>
+      <br>
+      <button id="modalClose" class="inputbox">Close</button>
+    </div>
+  </div>
+</body>
+<script src="https://sdk.amazonaws.com/js/aws-sdk-2.1692.0.min.js"></script>
+
+<script>
+  const secret = "K8ZckGDXsLgj1i6gDuCEc+X/A6U95rWMkpMCXQsq"
+  const key = "AKIAQPWAMOOURI73AT5R"
+  AWS.config.region = 'ap-south-1';
+  AWS.config.credentials = new AWS.Credentials({
+    accessKeyId: key,
+    secretAccessKey: secret,
+  })
+  const dynamodb = new AWS.DynamoDB();
+  const s3 = new AWS.S3();
+
+  const linkInput = document.getElementById('linkInput');
+  const linkSubmit = document.getElementById('linkSubmit');
+  const modalBack = document.getElementById('modalBack');
+  const message = document.getElementById('message');
+  const errorMessage = document.getElementById('errorMessage');
+  const modalClose = document.getElementById('modalClose');
+  const thanks = document.getElementById('thanks');
+  const uploadbutton = document.getElementById('uploadbutton');
+  const nameInput = document.getElementById('nameInput');
+  const filesInput = document.getElementById('fileInput');
+  const progress = document.getElementById('progress');
+
+  const showProgress = (text) => {
+    modalBack.style.display = 'flex';
+    progress.style.display = "block";
+    progress.innerHTML = text;
+  }
+
+  const hideProgress = () => {
+    modalBack.style.display = 'none';
+    progress.style.display = "none";
+  }
+
+  const showSuccessMessage = () => {
+    modalBack.style.display = 'flex';
+    thanks.style.display = "block";
+  }
+
+  const showErrorMessage = (errorText) => {
+    modalBack.style.display = 'flex';
+    message.style.display = "block";
+    errorMessage.innerHTML = errorText;
+  }
+
+  const onLinkSubmit = () => {
+    let link = linkInput.value;
+    if (link === '') {
+      showErrorMessage("Please enter a valid link.")
+    } else {
+      var params = {
+        Item: {
+          "link": {
+            S: link
+          },
+        }, 
+        TableName: "wedding_share"
+      };
+      dynamodb.putItem(params, function(err, data) {
+        if (err) {
+          showErrorMessage('Server Error. Please inform Subhash.')
+        }
+        else {
+          showSuccessMessage();
+        }
+      });
+    }
+  }
+
+  const onModalClose = () => {
+    modalBack.style.display = 'none';
+    message.style.display = "none";
+  }
+  linkSubmit.addEventListener('click', onLinkSubmit);
+  modalClose.addEventListener('click', onModalClose);
+
+  const uploadFile = async (file, name, time) => {
+    return new Promise((resolve, reject) => {
+      const params = {
+        Body: file, 
+        Bucket: "subhashweddingpics", 
+        Key: encodeURIComponent(name) + "/" + time.getTime() + "/" + file.name
+      };
+      s3.putObject(params, function(err, data) {
+        if (err) {
+          reject(file.name)
+        } else {
+          resolve()
+        }
+      });
+    })
+  }
+
+  const onUpload = async () => {
+    const time = new Date();
+    const name = nameInput.value;
+    const files = filesInput.files
+
+    if (!name) {
+      return showErrorMessage('Please enter your name.')
+    }
+    if (files.length === 0) {
+      return showErrorMessage('Please add files to upload.')
+    }
+
+    const fails = [];
+    let index = 0;
+
+    for (const file of files) {
+      index++;
+      showProgress('Uploading file ' + index +' of ' + files.length);
+      try {
+        await uploadFile(file, name, time);
+      } catch (e) {
+        fails.push(e);
+      }
+      
+    }
+
+    if (fails.length) {
+      hideProgress();
+      showErrorMessage("some files couldnt be uploaded")
+    } else {
+      hideProgress();
+      showSuccessMessage()
+    }
+  }
+
+  uploadbutton.addEventListener('click', onUpload);
+
+
+</script>
+
+</html>
